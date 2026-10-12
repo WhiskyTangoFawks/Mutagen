@@ -771,6 +771,14 @@ internal sealed class ListBinaryTranslation<T> : ListBinaryTranslation<MutagenWr
             reader.Position += subHeader.TotalLength;
             return [];
         }
+        else if (endMarker == null)
+        { 
+            return Parse( 
+                reader, 
+                transl,
+                triggeringRecord,
+                translationParams); 
+        } 
         else
         { 
             return Parse( 
@@ -793,7 +801,10 @@ internal sealed class ListBinaryTranslation<T> : ListBinaryTranslation<MutagenWr
         translationParams = translationParams.ShortCircuit(); 
         var ret = new ExtendedList<T>(); 
         var startingPos = reader.Position; 
-        for (int i = 0; i < amount; i++) 
+        // A count short of the entries that follow reads them all; a write recounts. A list closed by an end
+        // marker is left to its count, since an entry whose subrecords are out of order would read as two.
+        var readPastCount = triggeringRecord != null && endMarker == null;
+        for (int i = 0; i < amount || (readPastCount && !reader.Complete); i++) 
         { 
             var nextRecord = HeaderTranslation.GetNextRecordType(reader.Reader); 
             if (endMarker == nextRecord)
