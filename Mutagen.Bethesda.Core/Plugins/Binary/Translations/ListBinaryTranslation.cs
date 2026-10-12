@@ -800,12 +800,12 @@ internal sealed class ListBinaryTranslation<T> : ListBinaryTranslation<MutagenWr
         if (amount == 0 && nullIfZero) return []; 
         translationParams = translationParams.ShortCircuit(); 
         var ret = new ExtendedList<T>(); 
-        var startingPos = reader.Position; 
-        // A count short of the entries that follow reads them all; a write recounts. A list closed by an end
-        // marker is left to its count, since an entry whose subrecords are out of order would read as two.
-        var readPastCount = triggeringRecord != null && endMarker == null;
+        // Plugins can count fewer entries than follow. An entry that can open with any of several subrecords
+        // would read as two if its subrecords were out of order, so only a single-trigger list reads on.
+        var readPastCount = triggeringRecord?.TriggeringRecordTypes.Count == 1;
         for (int i = 0; i < amount || (readPastCount && !reader.Complete); i++) 
         { 
+            var startingPos = reader.Position; 
             var nextRecord = HeaderTranslation.GetNextRecordType(reader.Reader); 
             if (endMarker == nextRecord)
             {
