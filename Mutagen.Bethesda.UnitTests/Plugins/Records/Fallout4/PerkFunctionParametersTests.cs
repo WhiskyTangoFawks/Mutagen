@@ -14,9 +14,12 @@ using Fallout4Constants = Mutagen.Bethesda.Fallout4.Constants;
 
 namespace Mutagen.Bethesda.UnitTests.Plugins.Records.Fallout4;
 
-public class PerkActivateChoiceFlagsTests
+public class PerkFunctionParametersTests
 {
+    private const byte AbilityEffectType = 1;
     private const byte EntryPointEffectType = 2;
+    private const uint AbilitySpell = 0x00000800;
+    private const ushort PerkEntryId = 10;
     private const byte ActivateEntryPoint = 0x0E;
     private const byte AddActivateChoice = 9;
     private const byte SpellWithStrings = 4;
@@ -26,28 +29,33 @@ public class PerkActivateChoiceFlagsTests
 
     private static readonly MasterReferenceCollection Masters = new(Fallout4Constants.Fallout4);
 
-    private static byte[] BuildPerkBytes(ushort? flags)
+    private static byte[] PerkRecord(params byte[][] effectSubrecords)
     {
-        var content = new List<byte>();
-        content.AddRange(Subrecord("DATA", new byte[5]));
-        content.AddRange(Subrecord("PRKE", [EntryPointEffectType, 0, 0]));
-        content.AddRange(Subrecord("DATA", [ActivateEntryPoint, AddActivateChoice, 0]));
-        content.AddRange(Subrecord("EPFT", [SpellWithStrings]));
-        content.AddRange(Subrecord("EPF2", Encoding.ASCII.GetBytes(ButtonLabel + "\0")));
-        if (flags is { } value)
-        {
-            content.AddRange(Subrecord("EPF3", BitConverter.GetBytes(value)));
-        }
-        content.AddRange(Subrecord("PRKF", []));
-        var contentBytes = content.ToArray();
-
+        var content = Subrecord("DATA", new byte[5]).Concat(effectSubrecords.SelectMany(x => x)).ToArray();
         var header = new byte[GameConstants.Fallout4.MajorConstants.HeaderLength];
         Encoding.ASCII.GetBytes("PERK").CopyTo(header, 0);
-        BinaryPrimitives.WriteUInt32LittleEndian(header.AsSpan(4), checked((uint)contentBytes.Length));
+        BinaryPrimitives.WriteUInt32LittleEndian(header.AsSpan(4), checked((uint)content.Length));
         BinaryPrimitives.WriteUInt16LittleEndian(header.AsSpan(20), FormVersion);
-
-        return header.Concat(contentBytes).ToArray();
+        return header.Concat(content).ToArray();
     }
+
+    private static byte[] ActivateChoicePerk(ushort[] epf3) => PerkRecord(
+        [
+            Subrecord("PRKE", [EntryPointEffectType, 0, 0]),
+            Subrecord("DATA", [ActivateEntryPoint, AddActivateChoice, 0]),
+            Subrecord("EPFT", [SpellWithStrings]),
+            Subrecord("EPF2", Encoding.ASCII.GetBytes(ButtonLabel + "\0")),
+            .. epf3.Select(flags => Subrecord("EPF3", BitConverter.GetBytes(flags))),
+            Subrecord("PRKF", []),
+        ]);
+
+    private static byte[] AbilityPerkCarryingParameters() => PerkRecord(
+        Subrecord("PRKE", [AbilityEffectType, 0, 0]),
+        Subrecord("DATA", BitConverter.GetBytes(AbilitySpell)),
+        Subrecord("EPFB", BitConverter.GetBytes(PerkEntryId)),
+        Subrecord("EPF2", Encoding.ASCII.GetBytes(ButtonLabel + "\0")),
+        Subrecord("EPF3", BitConverter.GetBytes(RunImmediately)),
+        Subrecord("PRKF", []));
 
     private static byte[] Subrecord(string type, byte[] content)
     {
@@ -104,6 +112,14 @@ public class PerkActivateChoiceFlagsTests
         ((ushort?)choice.Flags).ShouldBe(flags);
     }
 
+    private static void ShouldHoldTheAbilitysParameters(IPerkGetter perk)
+    {
+        var ability = perk.Effects.Single().ShouldBeAssignableTo<IPerkAbilityEffectGetter>().ShouldNotBeNull();
+        ability.PerkEntryID.ShouldBe(PerkEntryId);
+        ability.ButtonLabel.ShouldNotBeNull().String.ShouldBe(ButtonLabel);
+        ((ushort?)ability.Flags).ShouldBe(RunImmediately);
+    }
+
     public static TheoryData<ushort?, ushort[]> FlagsAndTheirEpf3 => new()
     {
         { null, [] },
@@ -112,23 +128,23 @@ public class PerkActivateChoiceFlagsTests
 
     [Theory]
     [MemberData(nameof(FlagsAndTheirEpf3))]
-    public void DeepParse_AChoiceWithOrWithoutEpf3_ReadsItsFlags(ushort? flags, ushort[] _)
+    public void DeepParse_AChoiceWithOrWithoutEpf3_ReadsItsFlags(ushort? flags, ushort[] epf3)
     {
-        ShouldHoldTheChoice(ParseDeep(BuildPerkBytes(flags)), flags);
+        ShouldHoldTheChoice(ParseDeep(ActivateChoicePerk(epf3)), flags);
     }
 
     [Theory]
     [MemberData(nameof(FlagsAndTheirEpf3))]
-    public void Overlay_AChoiceWithOrWithoutEpf3_ReadsItsFlags(ushort? flags, ushort[] _)
+    public void Overlay_AChoiceWithOrWithoutEpf3_ReadsItsFlags(ushort? flags, ushort[] epf3)
     {
-        ShouldHoldTheChoice(ParseOverlay(BuildPerkBytes(flags)), flags);
+        ShouldHoldTheChoice(ParseOverlay(ActivateChoicePerk(epf3)), flags);
     }
 
     [Theory]
     [MemberData(nameof(FlagsAndTheirEpf3))]
     public void DeepParse_WritesEpf3OnlyForFlagsItRead_AndTheOverlayRereadsThem(ushort? flags, ushort[] epf3)
     {
-        var written = Write(ParseDeep(BuildPerkBytes(flags)));
+        var written = Write(ParseDeep(ActivateChoicePerk(epf3)));
         WrittenFlags(written).ShouldBe(epf3);
         ShouldHoldTheChoice(ParseOverlay(written), flags);
     }
@@ -137,8 +153,20 @@ public class PerkActivateChoiceFlagsTests
     [MemberData(nameof(FlagsAndTheirEpf3))]
     public void Overlay_WritesEpf3OnlyForFlagsItRead_AndTheDeepParseRereadsThem(ushort? flags, ushort[] epf3)
     {
-        var written = Write(ParseOverlay(BuildPerkBytes(flags)));
+        var written = Write(ParseOverlay(ActivateChoicePerk(epf3)));
         WrittenFlags(written).ShouldBe(epf3);
         ShouldHoldTheChoice(ParseDeep(written), flags);
+    }
+
+    [Fact]
+    public void DeepParse_AnAbilityCarryingFunctionParameters_WritesThem_AndTheOverlayRereadsThem()
+    {
+        ShouldHoldTheAbilitysParameters(ParseOverlay(Write(ParseDeep(AbilityPerkCarryingParameters()))));
+    }
+
+    [Fact]
+    public void Overlay_AnAbilityCarryingFunctionParameters_WritesThem_AndTheDeepParseRereadsThem()
+    {
+        ShouldHoldTheAbilitysParameters(ParseDeep(Write(ParseOverlay(AbilityPerkCarryingParameters()))));
     }
 }
