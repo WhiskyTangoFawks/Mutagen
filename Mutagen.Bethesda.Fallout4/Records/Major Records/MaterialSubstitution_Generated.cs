@@ -1234,7 +1234,10 @@ namespace Mutagen.Bethesda.Fallout4
                 {
                     if (lastParsed.ShortCircuit((int)MaterialSubstitution_FieldIndex.ColorRemappingIndex, translationParams)) return ParseResult.Stop;
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.ColorRemappingIndex = FloatBinaryTranslation<MutagenFrame, MutagenWriter>.Instance.Parse(reader: frame.SpawnWithLength(contentLength));
+                    if (contentLength >= 4)
+                    {
+                        item.ColorRemappingIndex = FloatBinaryTranslation<MutagenFrame, MutagenWriter>.Instance.Parse(reader: frame.SpawnWithLength(contentLength));
+                    }
                     return (int)MaterialSubstitution_FieldIndex.ColorRemappingIndex;
                 }
                 default:
@@ -1417,7 +1420,10 @@ namespace Mutagen.Bethesda.Fallout4
                 case RecordTypeInts.CNAM:
                 {
                     if (lastParsed.ShortCircuit((int)MaterialSubstitution_FieldIndex.ColorRemappingIndex, translationParams)) return ParseResult.Stop;
-                    _ColorRemappingIndexLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _ColorRemappingIndexLocation = (stream.Position - offset);
+                    }
                     return (int)MaterialSubstitution_FieldIndex.ColorRemappingIndex;
                 }
                 default:

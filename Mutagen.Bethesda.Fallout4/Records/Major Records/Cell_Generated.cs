@@ -6377,19 +6377,28 @@ namespace Mutagen.Bethesda.Fallout4
                 case RecordTypeInts.VISI:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.PreVisFilesTimestamp = frame.ReadUInt16();
+                    if (contentLength >= 2)
+                    {
+                        item.PreVisFilesTimestamp = frame.ReadUInt16();
+                    }
                     return (int)Cell_FieldIndex.PreVisFilesTimestamp;
                 }
                 case RecordTypeInts.RVIS:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.InPreVisFileOf.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    if (contentLength >= 4)
+                    {
+                        item.InPreVisFileOf.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    }
                     return (int)Cell_FieldIndex.InPreVisFileOf;
                 }
                 case RecordTypeInts.PCMB:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.PreCombinedFilesTimestamp = frame.ReadUInt16();
+                    if (contentLength >= 2)
+                    {
+                        item.PreCombinedFilesTimestamp = frame.ReadUInt16();
+                    }
                     return (int)Cell_FieldIndex.PreCombinedFilesTimestamp;
                 }
                 case RecordTypeInts.XCLC:
@@ -6405,13 +6414,19 @@ namespace Mutagen.Bethesda.Fallout4
                 case RecordTypeInts.CNAM:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.PrecombinedObjectLevelXY = frame.ReadUInt8();
+                    if (contentLength >= 1)
+                    {
+                        item.PrecombinedObjectLevelXY = frame.ReadUInt8();
+                    }
                     return (int)Cell_FieldIndex.PrecombinedObjectLevelXY;
                 }
                 case RecordTypeInts.ZNAM:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.PrecombinedObjectLevelZ = frame.ReadUInt8();
+                    if (contentLength >= 1)
+                    {
+                        item.PrecombinedObjectLevelZ = frame.ReadUInt8();
+                    }
                     return (int)Cell_FieldIndex.PrecombinedObjectLevelZ;
                 }
                 case RecordTypeInts.TVDT:
@@ -6428,13 +6443,19 @@ namespace Mutagen.Bethesda.Fallout4
                 case RecordTypeInts.LTMP:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.LightingTemplate.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    if (contentLength >= 4)
+                    {
+                        item.LightingTemplate.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    }
                     return (int)Cell_FieldIndex.LightingTemplate;
                 }
                 case RecordTypeInts.XCLW:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.WaterHeight = FloatBinaryTranslation<MutagenFrame, MutagenWriter>.Instance.Parse(reader: frame.SpawnWithLength(contentLength));
+                    if (contentLength >= 4)
+                    {
+                        item.WaterHeight = FloatBinaryTranslation<MutagenFrame, MutagenWriter>.Instance.Parse(reader: frame.SpawnWithLength(contentLength));
+                    }
                     return (int)Cell_FieldIndex.WaterHeight;
                 }
                 case RecordTypeInts.XCLR:
@@ -6450,7 +6471,10 @@ namespace Mutagen.Bethesda.Fallout4
                 case RecordTypeInts.XLCN:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.Location.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    if (contentLength >= 4)
+                    {
+                        item.Location.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    }
                     return (int)Cell_FieldIndex.Location;
                 }
                 case RecordTypeInts.XWCN:
@@ -6467,7 +6491,10 @@ namespace Mutagen.Bethesda.Fallout4
                 case RecordTypeInts.XCWT:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.Water.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    if (contentLength >= 4)
+                    {
+                        item.Water.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    }
                     return (int)Cell_FieldIndex.Water;
                 }
                 case RecordTypeInts.XOWN:
@@ -6478,13 +6505,19 @@ namespace Mutagen.Bethesda.Fallout4
                 case RecordTypeInts.XRNK:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.FactionRank = frame.ReadInt32();
+                    if (contentLength >= 4)
+                    {
+                        item.FactionRank = frame.ReadInt32();
+                    }
                     return (int)Cell_FieldIndex.FactionRank;
                 }
                 case RecordTypeInts.XILL:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.LockList.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    if (contentLength >= 4)
+                    {
+                        item.LockList.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    }
                     return (int)Cell_FieldIndex.LockList;
                 }
                 case RecordTypeInts.XILW:
@@ -6504,37 +6537,55 @@ namespace Mutagen.Bethesda.Fallout4
                 case RecordTypeInts.XCCM:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.SkyAndWeatherFromRegion.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    if (contentLength >= 4)
+                    {
+                        item.SkyAndWeatherFromRegion.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    }
                     return (int)Cell_FieldIndex.SkyAndWeatherFromRegion;
                 }
                 case RecordTypeInts.XCAS:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.AcousticSpace.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    if (contentLength >= 4)
+                    {
+                        item.AcousticSpace.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    }
                     return (int)Cell_FieldIndex.AcousticSpace;
                 }
                 case RecordTypeInts.XEZN:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.EncounterZone.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    if (contentLength >= 4)
+                    {
+                        item.EncounterZone.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    }
                     return (int)Cell_FieldIndex.EncounterZone;
                 }
                 case RecordTypeInts.XCMO:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.Music.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    if (contentLength >= 4)
+                    {
+                        item.Music.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    }
                     return (int)Cell_FieldIndex.Music;
                 }
                 case RecordTypeInts.XCIM:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.ImageSpace.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    if (contentLength >= 4)
+                    {
+                        item.ImageSpace.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    }
                     return (int)Cell_FieldIndex.ImageSpace;
                 }
                 case RecordTypeInts.XGDR:
                 {
                     frame.Position += frame.MetaData.Constants.SubConstants.HeaderLength;
-                    item.GodRays.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    if (contentLength >= 4)
+                    {
+                        item.GodRays.SetTo(FormLinkBinaryTranslation.Instance.Parse(reader: frame));
+                    }
                     return (int)Cell_FieldIndex.GodRays;
                 }
                 case RecordTypeInts.XPRI:
@@ -6857,17 +6908,26 @@ namespace Mutagen.Bethesda.Fallout4
                 }
                 case RecordTypeInts.VISI:
                 {
-                    _PreVisFilesTimestampLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 2)
+                    {
+                        _PreVisFilesTimestampLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.PreVisFilesTimestamp;
                 }
                 case RecordTypeInts.RVIS:
                 {
-                    _InPreVisFileOfLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _InPreVisFileOfLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.InPreVisFileOf;
                 }
                 case RecordTypeInts.PCMB:
                 {
-                    _PreCombinedFilesTimestampLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 2)
+                    {
+                        _PreCombinedFilesTimestampLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.PreCombinedFilesTimestamp;
                 }
                 case RecordTypeInts.XCLC:
@@ -6882,12 +6942,18 @@ namespace Mutagen.Bethesda.Fallout4
                 }
                 case RecordTypeInts.CNAM:
                 {
-                    _PrecombinedObjectLevelXYLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 1)
+                    {
+                        _PrecombinedObjectLevelXYLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.PrecombinedObjectLevelXY;
                 }
                 case RecordTypeInts.ZNAM:
                 {
-                    _PrecombinedObjectLevelZLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 1)
+                    {
+                        _PrecombinedObjectLevelZLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.PrecombinedObjectLevelZ;
                 }
                 case RecordTypeInts.TVDT:
@@ -6902,12 +6968,18 @@ namespace Mutagen.Bethesda.Fallout4
                 }
                 case RecordTypeInts.LTMP:
                 {
-                    _LightingTemplateLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _LightingTemplateLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.LightingTemplate;
                 }
                 case RecordTypeInts.XCLW:
                 {
-                    _WaterHeightLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _WaterHeightLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.WaterHeight;
                 }
                 case RecordTypeInts.XCLR:
@@ -6922,7 +6994,10 @@ namespace Mutagen.Bethesda.Fallout4
                 }
                 case RecordTypeInts.XLCN:
                 {
-                    _LocationLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _LocationLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.Location;
                 }
                 case RecordTypeInts.XWCN:
@@ -6937,7 +7012,10 @@ namespace Mutagen.Bethesda.Fallout4
                 }
                 case RecordTypeInts.XCWT:
                 {
-                    _WaterLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _WaterLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.Water;
                 }
                 case RecordTypeInts.XOWN:
@@ -6950,12 +7028,18 @@ namespace Mutagen.Bethesda.Fallout4
                 }
                 case RecordTypeInts.XRNK:
                 {
-                    _FactionRankLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _FactionRankLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.FactionRank;
                 }
                 case RecordTypeInts.XILL:
                 {
-                    _LockListLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _LockListLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.LockList;
                 }
                 case RecordTypeInts.XILW:
@@ -6970,32 +7054,50 @@ namespace Mutagen.Bethesda.Fallout4
                 }
                 case RecordTypeInts.XCCM:
                 {
-                    _SkyAndWeatherFromRegionLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _SkyAndWeatherFromRegionLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.SkyAndWeatherFromRegion;
                 }
                 case RecordTypeInts.XCAS:
                 {
-                    _AcousticSpaceLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _AcousticSpaceLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.AcousticSpace;
                 }
                 case RecordTypeInts.XEZN:
                 {
-                    _EncounterZoneLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _EncounterZoneLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.EncounterZone;
                 }
                 case RecordTypeInts.XCMO:
                 {
-                    _MusicLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _MusicLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.Music;
                 }
                 case RecordTypeInts.XCIM:
                 {
-                    _ImageSpaceLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _ImageSpaceLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.ImageSpace;
                 }
                 case RecordTypeInts.XGDR:
                 {
-                    _GodRaysLocation = (stream.Position - offset);
+                    if (stream.GetSubrecordHeader().ContentLength >= 4)
+                    {
+                        _GodRaysLocation = (stream.Position - offset);
+                    }
                     return (int)Cell_FieldIndex.GodRays;
                 }
                 case RecordTypeInts.XPRI:
