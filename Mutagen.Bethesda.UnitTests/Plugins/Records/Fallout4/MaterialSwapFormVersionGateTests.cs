@@ -70,7 +70,7 @@ public class MaterialSwapFormVersionGateTests
         item.Substitutions.Count.ShouldBe(2);
         item.Substitutions[0].ObsoleteTreeFolder.ShouldBe(string.Empty);
         item.Substitutions[0].ColorRemappingIndex.ShouldBe(1f);
-        item.Substitutions[1].OriginalMaterial.ShouldBe("SecondOriginal");
+        item.Substitutions[1].OriginalMaterial?.GivenPath.ShouldBe("SecondOriginal");
         item.Substitutions[1].ObsoleteTreeFolder.ShouldBeNull();
         item.Substitutions[1].ColorRemappingIndex.ShouldBe(2f);
     }
